@@ -7,34 +7,32 @@
 
 import argparse
 import json
-import os
+import datetime
 
-def taskAdd():
-    '''create json file here with:
-        id: A unique identifier for the task
-        description: A short description of the task
-        status: The status of the task (todo, in-progress, done)
-        createdAt: The date and time when the task was created
-        updatedAt: The date and time when the task was last updated 
-'''
-    tasks = {
-        'id': 1,
+#move this somewhere else later
+tasks = {
+        'id': 0,
         'description': '',
         'status': '',
         'createdAt': '',
         'updatedAt': ''
     }
-#if file doest not exist, create file
-    if not os.path.exists('tasks.json'):
 
+def taskAdd(task_name):
+#check if task name already exists and if json file exists
+#create json file if it doesn't exist, with an empty dictionary the value must be a list of dictionaries
+#open json file check what number of id
+#increment id by 1 for new task
+#add the task in a dictionary
+# add the dictionary to the list of dictionaries in the json file
 
-        with open('tasks.json', 'w') as f:
-            json.dump(tasks, f)
-
-        print('File created. Task Added Successfully')
-#if file exist, open file and append new task
+    tasks.update({'description': task_name, 'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")})
+    with open('tasks.json', 'a+') as f:
+        data = json.load(f)
+        data["tasks"].append(tasks)
+        f.seek(0)
+        json.dump(data, f)
     print('Task Added Successfully')
-
 
 def taskUpdate():
     pass
@@ -60,5 +58,18 @@ def taskMark():
 def main():
     parser = argparse.ArgumentParser(description='Task Tracker CLI')
 
-    parser.add_argument('-a', type = str, nargs = '+', metavar = 'taskAdd', default = None, help = 'Add a new task')
+    parser.add_argument('-a', type = str, metavar = '[Task Name]', default = None, help = 'Add a new task')
+    
     args = parser.parse_args()
+    
+    if args.a != None:
+        task_name = args.a
+        taskAdd(task_name)
+
+    with open('tasks.json') as f:
+        data = json.load(f)
+        
+    print(data.get('id'))
+
+if __name__ == '__main__':
+    main()
