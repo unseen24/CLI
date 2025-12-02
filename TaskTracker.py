@@ -7,52 +7,74 @@
 
 import argparse
 import json
+import os
 import datetime
 
 #move this somewhere else later
 tasks = {
-        'id': 0,
-        'description': '',
-        'status': '',
-        'createdAt': '',
-        'updatedAt': ''
+        "id": 0,
+        "description": "",
+        "status": "",
+        "createdAt": "",
+        "updatedAt": ""
     }
 
-def taskAdd(task_name):
+def task_add(task_name):
 #check if task name already exists and if json file exists
-#create json file if it doesn't exist, with an empty dictionary the value must be a list of dictionaries
-#open json file check what number of id
-#increment id by 1 for new task
-#add the task in a dictionary
-# add the dictionary to the list of dictionaries in the json file
+#add the new dictionary inside the list of the dictionary within the json file
+    if os.path.isfile("./tasks.json") == True :
+        with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
 
-    tasks.update({'description': task_name, 'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")})
-    with open('tasks.json', 'a+') as f:
-        data = json.load(f)
-        data["tasks"].append(tasks)
-        f.seek(0)
-        json.dump(data, f)
-    print('Task Added Successfully')
+            for x in json_file.values():
+                tasks.update(
+                    {
+                        'id': x[-1].get('id')+1,
+                        'description': task_name,
+                        'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
+                        }
+                    )
+        
+        with open('tasks.json', 'a') as f:
+            json.dump(tasks, f, indent=4)
 
-def taskUpdate():
+    else:
+        json_data = {
+            "tasks": [
+                {
+                    "id": 1,
+                    "description": task_name, 
+                    "status": "",
+                    "createdAt": datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+                    "updatedAt": ""
+                    }
+                ]
+        }
+        with open('tasks.json', 'w') as f:
+            json.dump(json_data, f, indent=4)
+
+
+
+    
+def task_update():
     pass
 
-def taskDelete():
+def task_delete():
     pass
 
-def taskInProgress():
+def task_in_progress():
     pass
 
-def taskDone():
+def task_done():
     pass   
 
-def taskListAll():
+def task_list_all():
     pass
 
-def taskNotDone():
+def task_not_done():
     pass
 
-def taskMark():
+def task_mark():
     pass
 
 def main():
@@ -64,12 +86,7 @@ def main():
     
     if args.a != None:
         task_name = args.a
-        taskAdd(task_name)
-
-    with open('tasks.json') as f:
-        data = json.load(f)
-        
-    print(data.get('id'))
+        task_add(task_name)
 
 if __name__ == '__main__':
     main()
