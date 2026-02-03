@@ -26,17 +26,18 @@ def task_add(task_name):
         with open('tasks.json', 'r') as f:
             json_file = json.load(f)
 
-            for x in json_file.values():
-                tasks.update(
-                    {
-                        'id': x[-1].get('id')+1,
-                        'description': task_name,
-                        'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
-                        }
-                    )
+            json_file["tasks"].append(
+                {
+                'id': json_file["tasks"][-1].get('id')+1,
+                'description': task_name,
+                "status": "",
+                'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+                "updatedAt": ""
+                    }
+            )
         
-        with open('tasks.json', 'a') as f:
-            json.dump(tasks, f, indent=4)
+        with open('tasks.json', 'w') as f:
+            json.dump(json_file, f, indent=4)
 
     else:
         json_data = {
@@ -78,6 +79,7 @@ def task_mark():
     pass
 
 def main():
+#wont run if json has errors
     parser = argparse.ArgumentParser(description='Task Tracker CLI')
 
     parser.add_argument('-a', type = str, metavar = '[Task Name]', default = None, help = 'Add a new task')
