@@ -25,19 +25,25 @@ def task_add(task_name):
     if os.path.isfile("./tasks.json") == True :
         with open('tasks.json', 'r') as f:
             json_file = json.load(f)
-
-            json_file["tasks"].append(
-                {
-                'id': json_file["tasks"][-1].get('id')+1,
-                'description': task_name,
-                "status": "",
-                'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p"),
-                "updatedAt": ""
+            
+            if any(task['description'] == task_name for task in json_file["tasks"]):
+                print("Task already exists.")
+            
+            else:
+                json_file["tasks"].append(
+                    {
+                    'id': json_file["tasks"][-1].get('id')+1,
+                    'description': task_name,
+                    "status": "",
+                    'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+                    "updatedAt": ""
                     }
             )
         
         with open('tasks.json', 'w') as f:
             json.dump(json_file, f, indent=4)
+
+        print("Task added successfully. ID:", json_file["tasks"][-1].get('id'))
 
     else:
         json_data = {
@@ -53,12 +59,25 @@ def task_add(task_name):
         }
         with open('tasks.json', 'w') as f:
             json.dump(json_data, f, indent=4)
-
+        print("Task added successfully. ID:", json_file["tasks"][-1].get('id'))
 
 
     
-def task_update():
-    pass
+def task_update(task_id, new_description):
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
+            
+            for task in json_file["tasks"]:
+                if task['id'] == task_id:
+                    task['description'] = new_description
+                    task['updatedAt'] = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
+                    print("Task updated successfully.")
+
+    with open('tasks.json', 'w') as f:
+            json.dump(json_file, f, indent=4)
+                    
+    #get id of task
+    #get description
 
 def task_delete():
     pass
@@ -83,12 +102,18 @@ def main():
     parser = argparse.ArgumentParser(description='Task Tracker CLI')
 
     parser.add_argument('-a', type = str, metavar = '[Task Name]', default = None, help = 'Add a new task')
+    parser.add_argument('-u', nargs=2,  metavar = ('[Task ID]', '[New Task Description]'), default = None, help = 'Update a task')
     
     args = parser.parse_args()
     
     if args.a != None:
         task_name = args.a
         task_add(task_name)
+
+    elif args.u != None:
+        task_id = int(args.u[0])
+        new_description = args.u[1]
+        task_update(task_id, new_description)
 
 if __name__ == '__main__':
     main()
