@@ -6,6 +6,7 @@
 # List all tasks that are in progress
 
 import argparse
+from html import parser
 import json
 import os
 import datetime
@@ -34,7 +35,7 @@ def task_add(task_name):
                     {
                     'id': json_file["tasks"][-1].get('id')+1,
                     'description': task_name,
-                    "status": "",
+                    "status": "todo",
                     'createdAt': datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p"),
                     "updatedAt": ""
                     }
@@ -51,7 +52,7 @@ def task_add(task_name):
                 {
                     "id": 1,
                     "description": task_name, 
-                    "status": "",
+                    "status": "todo",
                     "createdAt": datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p"),
                     "updatedAt": ""
                     }
@@ -76,44 +77,126 @@ def task_update(task_id, new_description):
     with open('tasks.json', 'w') as f:
             json.dump(json_file, f, indent=4)
                     
-    #get id of task
-    #get description
 
-def task_delete():
-    pass
+def task_delete(task_id):
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
+            
+            for task in json_file["tasks"]:
+                if task['id'] == task_id:
+                    json_file["tasks"].remove(task)
+                    print("Task deleted successfully.")
 
-def task_in_progress():
-    pass
+    with open('tasks.json', 'w') as f:
+            json.dump(json_file, f, indent=4)
 
-def task_done():
-    pass   
+def task_in_progress(task_id, ):
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
+            
+            for task in json_file["tasks"]:
+                if task['id'] == task_id:
+                    task['status'] = "in progress"
+                    task['updatedAt'] = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
+                    print("Task updated successfully.")
+
+    with open('tasks.json', 'w') as f:
+            json.dump(json_file, f, indent=4)
+
+def task_done(task_id):
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
+            
+            for task in json_file["tasks"]:
+                if task['id'] == task_id:
+                    task['status'] = "done"
+                    task['updatedAt'] = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
+                    print("Task updated successfully.")
+
+    with open('tasks.json', 'w') as f:
+            json.dump(json_file, f, indent=4)
 
 def task_list_all():
-    pass
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
 
-def task_not_done():
-    pass
+            for task in json_file["tasks"]:
+                    #make output more readable later
+                    print(task)
 
-def task_mark():
-    pass
+def task_list_todo():
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
+
+            for task in json_file["tasks"]:
+                if task['status'] == "todo":
+                    print(task)
+
+def task_list_done():
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
+
+            for task in json_file["tasks"]:
+                if task['status'] == "done":
+                    print(task)          
+
+def task_list_in_progress():
+    with open('tasks.json', 'r') as f:
+            json_file = json.load(f)
+
+            for task in json_file["tasks"]:
+                if task['status'] == "in progress":
+                    print(task)          
+
 
 def main():
 #wont run if json has errors
     parser = argparse.ArgumentParser(description='Task Tracker CLI')
 
-    parser.add_argument('-a', type = str, metavar = '[Task Name]', default = None, help = 'Add a new task')
-    parser.add_argument('-u', nargs=2,  metavar = ('[Task ID]', '[New Task Description]'), default = None, help = 'Update a task')
-    
+    parser.add_argument('-add', type = str, metavar = '[Task Name]', default = None, help = 'Add a new task')
+    parser.add_argument('-update', nargs=2,  metavar = ('[Task ID]', '[New Task Description]'), default = None, help = 'Update a task')
+    parser.add_argument('-delete', type = int, metavar = '[Task ID]', default = None, help = 'Delete a task')
+    parser.add_argument('-in-progress', type = int, metavar = '[Task ID]', default = None, help = 'Mark a task as in progress')
+    parser.add_argument('-done', type = int, metavar = '[Task ID]', default = None, help = 'Mark a task as done')
+    parser.add_argument('-list-all', action='store_true', help = 'List all tasks')
+    parser.add_argument('-list-done', action='store_true', help = 'List done tasks')
+    parser.add_argument('-list-todo', action='store_true', help = 'List todo tasks')
+    parser.add_argument('-list-in-progress', action='store_true', help = 'List in progress tasks')
+
     args = parser.parse_args()
     
-    if args.a != None:
-        task_name = args.a
+    if args.add != None:
+        task_name = args.add
         task_add(task_name)
 
-    elif args.u != None:
-        task_id = int(args.u[0])
-        new_description = args.u[1]
+    elif args.update != None:
+        task_id = int(args.update[0])
+        new_description = args.update[1]
         task_update(task_id, new_description)
+
+    elif args.delete != None:
+        task_id = args.d
+        task_delete(task_id)
+
+    elif args.in_progress != None:
+        task_id = args.in_progress
+        task_in_progress(task_id)
+
+    elif args.done != None:
+        task_id = args.done
+        task_done(task_id)    
+
+    elif args.list_all:
+        task_list_all()
+
+    elif args.list_done:
+        task_list_done()
+
+    elif args.list_todo:
+        task_list_todo()
+
+    elif args.list_in_progress:
+        task_list_in_progress()
 
 if __name__ == '__main__':
     main()
