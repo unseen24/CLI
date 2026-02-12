@@ -1,9 +1,3 @@
-# Add, Update, and Delete tasks
-# Mark a task as in progress or done
-# List all tasks
-# List all tasks that are done
-# List all tasks that are not done
-# List all tasks that are in progress
 
 import argparse
 from html import parser
@@ -11,7 +5,6 @@ import json
 import os
 import datetime
 
-#move this somewhere else later
 tasks = {
         "id": 0,
         "description": "",
@@ -21,8 +14,7 @@ tasks = {
     }
 
 def task_add(task_name):
-#check if task name already exists and if json file exists
-#add the new dictionary inside the list of the dictionary within the json file
+
     if os.path.isfile("./tasks.json") == True :
         with open('tasks.json', 'r') as f:
             json_file = json.load(f)
@@ -121,8 +113,7 @@ def task_list_all():
             json_file = json.load(f)
 
             for task in json_file["tasks"]:
-                    #make output more readable later
-                    print(task)
+                    print(f'Task ID: {task['id']:<5} Description: {task['description']:<30} Status: {task['status']}')
 
 def task_list_todo():
     with open('tasks.json', 'r') as f:
@@ -130,7 +121,7 @@ def task_list_todo():
 
             for task in json_file["tasks"]:
                 if task['status'] == "todo":
-                    print(task)
+                    print(f'Task ID: {task['id']:<5} Description: {task['description']:<30} Status: {task['status']}')
 
 def task_list_done():
     with open('tasks.json', 'r') as f:
@@ -138,7 +129,7 @@ def task_list_done():
 
             for task in json_file["tasks"]:
                 if task['status'] == "done":
-                    print(task)          
+                    print(f'Task ID: {task['id']:<5} Description: {task['description']:<30} Status: {task['status']}')          
 
 def task_list_in_progress():
     with open('tasks.json', 'r') as f:
@@ -146,11 +137,10 @@ def task_list_in_progress():
 
             for task in json_file["tasks"]:
                 if task['status'] == "in progress":
-                    print(task)          
+                    print(f'Task ID: {task['id']:<5} Description: {task['description']:<30} Status: {task['status']}')          
 
 
 def main():
-#wont run if json has errors
     parser = argparse.ArgumentParser(description='Task Tracker CLI')
 
     parser.add_argument('-add', type = str, metavar = '[Task Name]', default = None, help = 'Add a new task')
@@ -175,7 +165,7 @@ def main():
         task_update(task_id, new_description)
 
     elif args.delete != None:
-        task_id = args.d
+        task_id = args.delete
         task_delete(task_id)
 
     elif args.in_progress != None:
